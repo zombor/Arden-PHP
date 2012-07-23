@@ -6,7 +6,7 @@ class Arden_Repository_KohanaDatabase
 		'insert' => 'Database_Query_Builder_Insert',
 	];
 
-	public function __construct(Database $database, $table_name = NULL)
+	public function __construct($database, $table_name = NULL)
 	{
 		$this->_database = $database;
 
@@ -35,6 +35,21 @@ class Arden_Repository_KohanaDatabase
 
 		$id = $qb->table($this->_table_name)->columns($columns)->values($values)->execute($this->_database);
 		$object->id = $id[0];
+
+		return $object;
+	}
+
+	public function update($object, $qb = NULL)
+	{
+		$reflection = new ReflectionClass($object);
+		$properties = $reflection->getProperties(ReflectionProperty::IS_PUBLIC);
+		$set = [];
+		foreach ($properties as $p)
+		{
+			$set[$p->getName()] = $object->{$p->getName()};
+		}
+
+		$updated = $qb->table($this->_table_name)->set($set)->execute($this->_database);
 
 		return $object;
 	}
