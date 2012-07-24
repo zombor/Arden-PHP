@@ -1,6 +1,7 @@
 <?php
 
 require 'classes/Arden/Repository/KohanaDatabase.php';
+require 'classes/Arden/InvalidObjectException.php';
 
 class DescribeKohanaDatabase extends \PHPSpec\Context
 {
@@ -47,6 +48,17 @@ class DescribeKohanaDatabase extends \PHPSpec\Context
 		$this->spec($new_user->id)->should->be(1);
 	}
 
+	public function itRaisesAnExceptionWhenInsertingObjectWithId()
+	{
+		$user = new Model_User(1, 'foo@bar.com');
+		$this->spec(
+			function() use($user)
+			{
+				$this->repo->create($user);
+			}
+		)->should->throwException('Arden_InvalidObjectException');
+	}
+
 	public function itUpdatesARecordFromALoadedObject()
 	{
 		$user = new Model_User(1, 'foo@bar.com');
@@ -69,6 +81,17 @@ class DescribeKohanaDatabase extends \PHPSpec\Context
 		$new_user = $this->repo->update($user);
 	}
 
+	public function itRaisesAnExceptionWhenUpdatingObjectWithNoId()
+	{
+		$user = new Model_User(NULL, 'foo@bar.com');
+		$this->spec(
+			function() use($user)
+			{
+				$this->repo->update($user);
+			}
+		)->should->throwException('Arden_InvalidObjectException');
+	}
+
 	public function itDeletesALoadedRecord()
 	{
 		$user = new Model_User(1, 'foo@bar.com');
@@ -89,6 +112,17 @@ class DescribeKohanaDatabase extends \PHPSpec\Context
 			->andReturn(1);
 
 		$this->spec($this->repo->delete($user))->should->be(TRUE);
+	}
+
+	public function itRaisesAnExceptionWhenDeletingObjectWithNoId()
+	{
+		$user = new Model_User(NULL, 'foo@bar.com');
+		$this->spec(
+			function() use($user)
+			{
+				$this->repo->delete($user);
+			}
+		)->should->throwException('Arden_InvalidObjectException');
 	}
 }
 

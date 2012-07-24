@@ -22,6 +22,11 @@ class Arden_Repository_KohanaDatabase
 
 	public function create($object)
 	{
+		if ($object->id)
+		{
+			throw new Arden_InvalidObjectException('Cannot create a loaded object');
+		}
+
 		$reflection = new ReflectionClass($object);
 		$properties = $reflection->getProperties(ReflectionProperty::IS_PUBLIC);
 		$columns = [];
@@ -40,6 +45,11 @@ class Arden_Repository_KohanaDatabase
 
 	public function update($object)
 	{
+		if ( ! $object->id)
+		{
+			throw new Arden_InvalidObjectException('Cannot update a non-loaded object');
+		}
+
 		$reflection = new ReflectionClass($object);
 		$properties = $reflection->getProperties(ReflectionProperty::IS_PUBLIC);
 		$set = [];
@@ -55,6 +65,11 @@ class Arden_Repository_KohanaDatabase
 
 	public function delete($object)
 	{
+		if ( ! $object->id)
+		{
+			throw new Arden_InvalidObjectException('Cannot delete a non-loaded object');
+		}
+
 		return (bool) $this->_qb_delete->table($this->_table_name)->where('id', '=', $object->id)->execute($this->_database);
 	}
 }
