@@ -6,20 +6,26 @@ class DescribeKohanaDatabase extends \PHPSpec\Context
 {
 	public function before()
 	{
+		$this->qb_insert = Mockery::mock('qb_insert');
+		$this->qb_update = Mockery::mock('qb_update');
 		$this->database = Mockery::mock('Database');
+		$this->repo = new Arden_Repository_KohanaDatabase(
+			$this->database,
+			$this->qb_insert,
+			$this->qb_update,
+			'users'
+		);
 	}
 
 	public function itCreatesARecordFromAnUnloadedObject()
 	{
 		$user = new Model_User(NULL, 'foo@bar.com');
-		$qb = Mockery::mock('qb');
-		$qb->shouldReceive('table')->with('users')->andReturn($qb);
-		$qb->shouldReceive('columns')->with(['id', 'email'])->andReturn($qb);
-		$qb->shouldReceive('values')->with([NULL, 'foo@bar.com'])->andReturn($qb);
-		$qb->shouldReceive('execute')->with($this->database)->andReturn([1, 1]);
+		$this->qb_insert->shouldReceive('table')->with('users')->andReturn($this->qb_insert);
+		$this->qb_insert->shouldReceive('columns')->with(['id', 'email'])->andReturn($this->qb_insert);
+		$this->qb_insert->shouldReceive('values')->with([NULL, 'foo@bar.com'])->andReturn($this->qb_insert);
+		$this->qb_insert->shouldReceive('execute')->with($this->database)->andReturn([1, 1]);
 
-		$repo = new Arden_Repository_KohanaDatabase($this->database, 'users');
-		$new_user = $repo->create($user, $qb);
+		$new_user = $this->repo->create($user);
 
 		$this->spec($new_user->id)->should->be(1);
 	}
@@ -27,13 +33,11 @@ class DescribeKohanaDatabase extends \PHPSpec\Context
 	public function itUpdatesARecordFromALoadedObject()
 	{
 		$user = new Model_User(1, 'foo@bar.com');
-		$qb = Mockery::mock('qb');
-		$qb->shouldReceive('table')->once()->with('users')->andReturn($qb);
-		$qb->shouldReceive('set')->once()->with(['id' => 1, 'email' => 'foo@bar.com'])->andReturn($qb);
-		$qb->shouldReceive('execute')->once()->with($this->database)->andReturn(1);
+		$this->qb_update->shouldReceive('table')->once()->with('users')->andReturn($this->qb_update);
+		$this->qb_update->shouldReceive('set')->once()->with(['id' => 1, 'email' => 'foo@bar.com'])->andReturn($this->qb_update);
+		$this->qb_update->shouldReceive('execute')->once()->with($this->database)->andReturn(1);
 
-		$repo = new Arden_Repository_KohanaDatabase($this->database, 'users');
-		$new_user = $repo->update($user, $qb);
+		$new_user = $this->repo->update($user);
 	}
 }
 
