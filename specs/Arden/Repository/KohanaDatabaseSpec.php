@@ -20,10 +20,25 @@ class DescribeKohanaDatabase extends \PHPSpec\Context
 	public function itCreatesARecordFromAnUnloadedObject()
 	{
 		$user = new Model_User(NULL, 'foo@bar.com');
-		$this->qb_insert->shouldReceive('table')->with('users')->andReturn($this->qb_insert);
-		$this->qb_insert->shouldReceive('columns')->with(['id', 'email'])->andReturn($this->qb_insert);
-		$this->qb_insert->shouldReceive('values')->with([NULL, 'foo@bar.com'])->andReturn($this->qb_insert);
-		$this->qb_insert->shouldReceive('execute')->with($this->database)->andReturn([1, 1]);
+		$this->qb_insert
+			->shouldReceive('table')
+			->once()
+			->with('users')
+			->andReturn($this->qb_insert);
+		$this->qb_insert
+			->shouldReceive('columns')
+			->once()
+			->with(['id', 'email'])
+			->andReturn($this->qb_insert);
+		$this->qb_insert
+			->shouldReceive('values')
+			->once()
+			->with([NULL, 'foo@bar.com'])
+			->andReturn($this->qb_insert);
+		$this->qb_insert
+			->shouldReceive('execute')
+			->once()
+			->with($this->database)->andReturn([1, 1]);
 
 		$new_user = $this->repo->create($user);
 
@@ -33,9 +48,21 @@ class DescribeKohanaDatabase extends \PHPSpec\Context
 	public function itUpdatesARecordFromALoadedObject()
 	{
 		$user = new Model_User(1, 'foo@bar.com');
-		$this->qb_update->shouldReceive('table')->once()->with('users')->andReturn($this->qb_update);
-		$this->qb_update->shouldReceive('set')->once()->with(['id' => 1, 'email' => 'foo@bar.com'])->andReturn($this->qb_update);
-		$this->qb_update->shouldReceive('execute')->once()->with($this->database)->andReturn(1);
+		$this->qb_update
+			->shouldReceive('table')
+			->once()
+			->with('users')
+			->andReturn($this->qb_update);
+		$this->qb_update
+			->shouldReceive('set')
+			->once()
+			->with(['id' => 1, 'email' => 'foo@bar.com'])
+			->andReturn($this->qb_update);
+		$this->qb_update
+			->shouldReceive('execute')
+			->once()
+			->with($this->database)
+			->andReturn(1);
 
 		$new_user = $this->repo->update($user);
 	}
