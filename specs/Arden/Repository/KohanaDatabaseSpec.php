@@ -20,6 +20,23 @@ class DescribeKohanaDatabase extends \PHPSpec\Context
 		);
 	}
 
+	public function itLoadsASingleObject()
+	{
+		$this->pending();
+
+		$user = $this->repo->load_object(['id' => 1]);
+	}
+
+	public function itLoadsMultipleObjects()
+	{
+		$this->pending();
+
+		$users = $this->repo->load_set([
+			['id' => 1],
+			['id' => 2],
+		]);
+	}
+
 	public function itCreatesARecordFromAnUnloadedObject()
 	{
 		$user = new Model_User(NULL, 'foo@bar.com');
