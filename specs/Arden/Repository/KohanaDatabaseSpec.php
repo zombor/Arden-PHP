@@ -7,24 +7,49 @@ class DescribeKohanaDatabase extends \PHPSpec\Context
 {
 	public function before()
 	{
+		$this->qb_select = Mockery::mock('qb_select');
 		$this->qb_insert = Mockery::mock('qb_insert');
 		$this->qb_update = Mockery::mock('qb_update');
 		$this->qb_delete = Mockery::mock('qb_delete');
 		$this->database = Mockery::mock('Database');
 		$this->repo = new Arden_Repository_KohanaDatabase(
 			$this->database,
+			$this->qb_select,
 			$this->qb_insert,
 			$this->qb_update,
 			$this->qb_delete,
+			'Model_User',
 			'users'
 		);
 	}
 
 	public function itLoadsASingleObject()
 	{
-		$this->pending();
+		$saved_user = new Model_User(1, 'foo@bar.com');
+		$results = Mockery::mock('result');
+		$results->shouldReceive('current')->once()->andReturn($saved_user);
+		$this->qb_select->shouldReceive('from')
+			->once()
+			->with('users')
+			->andReturn($this->qb_select);
+		$this->qb_select->shouldReceive('where')
+			->once()
+			->with('id', '=', 1);
+		$this->qb_select->shouldReceive('as_object')
+			->once()
+			->with('Model_User');
+		$this->qb_select->shouldReceive('execute')
+			->once()
+			->with($this->database)
+			->andReturn($results);
 
 		$user = $this->repo->load_object(['id' => 1]);
+		$this->spec($user)->should->be($saved_user);
+	}
+
+	public function itReturnsNullWhenNoObjectIsFound()
+	{
+		$this->pending();
 	}
 
 	public function itLoadsMultipleObjects()

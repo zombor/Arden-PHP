@@ -2,11 +2,14 @@
 
 class Arden_Repository_KohanaDatabase
 {
+	protected $_model_class;
+
+	protected $_qb_select;
 	protected $_qb_insert;
 	protected $_qb_update;
 	protected $_qb_delete;
 
-	public function __construct($database, $qb_insert, $qb_update, $qb_delete, $table_name = NULL)
+	public function __construct($database, $qb_select, $qb_insert, $qb_update, $qb_delete, $model_class = NULL, $table_name = NULL)
 	{
 		$this->_database = $database;
 
@@ -15,9 +18,27 @@ class Arden_Repository_KohanaDatabase
 			$this->_table_name = $table_name;
 		}
 
+		if ($model_class)
+		{
+			$this->_model_class = $model_class;
+		}
+
+		$this->_qb_select = $qb_select;
 		$this->_qb_insert = $qb_insert;
 		$this->_qb_update = $qb_update;
 		$this->_qb_delete = $qb_delete;
+	}
+
+	public function load_object(array $parameters)
+	{
+		$this->_qb_select->from($this->_table_name);
+		$this->_qb_select->as_object($this->_model_class);
+		foreach ($parameters as $column => $value)
+		{
+			$this->_qb_select->where($column, '=', $value);
+		}
+
+		return $this->_qb_select->execute($this->_database)->current();
 	}
 
 	public function create($object)
