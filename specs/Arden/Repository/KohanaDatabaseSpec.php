@@ -49,17 +49,56 @@ class DescribeKohanaDatabase extends \PHPSpec\Context
 
 	public function itReturnsNullWhenNoObjectIsFound()
 	{
-		$this->pending();
+		$results = Mockery::mock('result');
+		$results->shouldReceive('current')->once()->andReturn(NULL);
+		$this->qb_select->shouldReceive('from')
+			->once()
+			->with('users')
+			->andReturn($this->qb_select);
+		$this->qb_select->shouldReceive('where')
+			->once()
+			->with('id', '=', 1);
+		$this->qb_select->shouldReceive('as_object')
+			->once()
+			->with('Model_User');
+		$this->qb_select->shouldReceive('execute')
+			->once()
+			->with($this->database)
+			->andReturn($results);
+
+		$user = $this->repo->load_object(['id' => 1]);
+		$this->spec($user)->should->beNull();
 	}
 
 	public function itLoadsMultipleObjects()
 	{
-		$this->pending();
+		$user1 = new Model_User(1, 'foo@bar.com');
+		$user2 = new Model_User(2, 'foo@bar.com');
+
+		$results = [$user1, $user2];
+		$this->qb_select->shouldReceive('from')
+			->once()->with('users');
+		$this->qb_select->shouldReceive('as_object')
+			->once()->with('Model_User');
+		$this->qb_select->shouldReceive('where')
+			->once()->with('id', '=', 1);
+		$this->qb_select->shouldReceive('where')
+			->once()->with('id', '=', 2);
+		$this->qb_select->shouldReceive('execute')
+			->once()->with($this->database)
+			->andReturn($results);
+
+
 
 		$users = $this->repo->load_set([
 			['id' => 1],
 			['id' => 2],
 		]);
+		$this->spec($users)->should->be(
+			[
+				$user1, $user2
+			]
+		);
 	}
 
 	public function itCreatesARecordFromAnUnloadedObject()

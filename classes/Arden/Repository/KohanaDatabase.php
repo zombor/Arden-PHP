@@ -41,6 +41,27 @@ class Arden_Repository_KohanaDatabase
 		return $this->_qb_select->execute($this->_database)->current();
 	}
 
+	public function load_set(array $parameters)
+	{
+		$this->_qb_select->from($this->_table_name);
+		$this->_qb_select->as_object($this->_model_class);
+		foreach($parameters as $parameter_set)
+		{
+			foreach ($parameter_set as $column => $value)
+			{
+				$this->_qb_select->where($column, '=', $value);
+			}
+		}
+
+		$results = [];
+		foreach ($this->_qb_select->execute($this->_database) as $model)
+		{
+			$results[] = $model;
+		}
+
+		return $results;
+	}
+
 	public function create($object)
 	{
 		if ($object->id)
