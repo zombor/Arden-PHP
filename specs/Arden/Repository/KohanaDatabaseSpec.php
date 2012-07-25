@@ -8,11 +8,13 @@ class DescribeKohanaDatabase extends \PHPSpec\Context
 	{
 		$this->qb_insert = Mockery::mock('qb_insert');
 		$this->qb_update = Mockery::mock('qb_update');
+		$this->qb_delete = Mockery::mock('qb_delete');
 		$this->database = Mockery::mock('Database');
 		$this->repo = new Arden_Repository_KohanaDatabase(
 			$this->database,
 			$this->qb_insert,
 			$this->qb_update,
+			$this->qb_delete,
 			'users'
 		);
 	}
@@ -65,6 +67,28 @@ class DescribeKohanaDatabase extends \PHPSpec\Context
 			->andReturn(1);
 
 		$new_user = $this->repo->update($user);
+	}
+
+	public function itDeletesALoadedRecord()
+	{
+		$user = new Model_User(1, 'foo@bar.com');
+		$this->qb_delete
+			->shouldReceive('table')
+			->once()
+			->with('users')
+			->andReturn($this->qb_delete);
+		$this->qb_delete
+			->shouldReceive('where')
+			->once()
+			->with('id', '=', 1)
+			->andreturn($this->qb_delete);
+		$this->qb_delete
+			->shouldReceive('execute')
+			->once()
+			->with($this->database)
+			->andReturn(1);
+
+		$this->spec($this->repo->delete($user))->should->be(TRUE);
 	}
 }
 
