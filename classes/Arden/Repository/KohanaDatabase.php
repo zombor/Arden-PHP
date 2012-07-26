@@ -79,8 +79,7 @@ class Arden_Repository_KohanaDatabase
 			$values[] = $object->{$p->getName()};
 		}
 
-		$id = $this->_qb_insert->table($this->_table_name)->columns($columns)->values($values)->execute($this->_database);
-		$object->id = $id[0];
+		$object->id = $this->_qb_insert->table($this->_table_name)->columns($columns)->values($values)->execute($this->_database)[0];
 
 		return $object;
 	}
