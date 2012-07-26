@@ -3,6 +3,7 @@
 class Arden_Repository_KohanaDatabase
 {
 	protected $_model_class;
+	protected $_table_name;
 
 	protected $_qb_select;
 	protected $_qb_insert;
