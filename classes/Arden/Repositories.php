@@ -1,6 +1,6 @@
 <?php
 
-class AutoModeler_Repositories
+class Arden_Repositories
 {
 	protected static $_repositories = array();
 

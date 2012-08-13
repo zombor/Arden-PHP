@@ -6,7 +6,7 @@ class DescribeArdenRepositories extends \PHPSpec\Context
 {
 	public function itStoresRepositoriesForRetreival()
 	{
-		AutoModeler_Repositories::add('foo', 'bar');
-		$this->spec(AutoModeler_Repositories::fetch('foo'))->should->be('bar');
+		Arden_Repositories::add('foo', 'bar');
+		$this->spec(Arden_Repositories::fetch('foo'))->should->be('bar');
 	}
 }
