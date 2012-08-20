@@ -100,7 +100,7 @@ class Arden_Repository_KohanaDatabase
 			$set[$p->getName()] = $object->{$p->getName()};
 		}
 
-		$updated = $this->_qb_update->table($this->_table_name)->set($set)->execute($this->_database);
+		$updated = $this->_qb_update->table($this->_table_name)->where('id', '=', $object->id)->set($set)->execute($this->_database);
 
 		return $object;
 	}

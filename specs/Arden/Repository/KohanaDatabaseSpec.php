@@ -154,6 +154,11 @@ class DescribeKohanaDatabase extends \PHPSpec\Context
 			->with(['id' => 1, 'email' => 'foo@bar.com'])
 			->andReturn($this->qb_update);
 		$this->qb_update
+			->shouldReceive('where')
+			->once()
+			->with('id', '=', 1)
+			->andReturn($this->qb_update);
+		$this->qb_update
 			->shouldReceive('execute')
 			->once()
 			->with($this->database)
