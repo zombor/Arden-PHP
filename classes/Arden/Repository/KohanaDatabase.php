@@ -71,7 +71,7 @@ class Arden_Repository_KohanaDatabase
 		return $results;
 	}
 
-	public function create($object, $qb_insert = NULL)
+	public function create($object, $insert = NULL)
 	{
 		if ($object->id)
 		{
@@ -88,9 +88,9 @@ class Arden_Repository_KohanaDatabase
 			$values[] = $object->{$p->getName()};
 		}
 
-		if ($qb_insert === NULL)
+		if ($insert === NULL)
 		{
-			$qb_insert = clone $this->_qb_insert;
+			$insert = clone $this->_qb_insert;
 		}
 		$object->id = $insert->table($this->_table_name)->columns($columns)->values($values)->execute($this->_database)[0];
 
