@@ -30,32 +30,40 @@ class Arden_Repository_KohanaDatabase
 		$this->_qb_delete = $qb_delete;
 	}
 
-	public function load_object(array $parameters)
+	public function load_object(array $parameters, $select = NULL)
 	{
-		$this->_qb_select->from($this->_table_name);
-		$this->_qb_select->as_object($this->_model_class);
+		if ($select === NULL)
+		{
+			$select = clone $this->_qb_select;
+		}
+		$select->from($this->_table_name);
+		$select->as_object($this->_model_class);
 		foreach ($parameters as $column => $value)
 		{
-			$this->_qb_select->where($column, '=', $value);
+			$select->where($column, '=', $value);
 		}
 
-		return $this->_qb_select->execute($this->_database)->current();
+		return $select->execute($this->_database)->current();
 	}
 
-	public function load_set(array $parameters)
+	public function load_set(array $parameters, $select = NULL)
 	{
-		$this->_qb_select->from($this->_table_name);
-		$this->_qb_select->as_object($this->_model_class);
+		if ($select === NULL)
+		{
+			$select = clone $this->_qb_select;
+		}
+		$select->from($this->_table_name);
+		$select->as_object($this->_model_class);
 		foreach($parameters as $parameter_set)
 		{
 			foreach ($parameter_set as $column => $value)
 			{
-				$this->_qb_select->where($column, '=', $value);
+				$select->where($column, '=', $value);
 			}
 		}
 
 		$results = [];
-		foreach ($this->_qb_select->execute($this->_database) as $model)
+		foreach ($select->execute($this->_database) as $model)
 		{
 			$results[] = $model;
 		}
@@ -63,7 +71,7 @@ class Arden_Repository_KohanaDatabase
 		return $results;
 	}
 
-	public function create($object)
+	public function create($object, $qb_insert = NULL)
 	{
 		if ($object->id)
 		{
@@ -80,12 +88,16 @@ class Arden_Repository_KohanaDatabase
 			$values[] = $object->{$p->getName()};
 		}
 
-		$object->id = $this->_qb_insert->table($this->_table_name)->columns($columns)->values($values)->execute($this->_database)[0];
+		if ($qb_insert === NULL)
+		{
+			$qb_insert = clone $this->_qb_insert;
+		}
+		$object->id = $insert->table($this->_table_name)->columns($columns)->values($values)->execute($this->_database)[0];
 
 		return $object;
 	}
 
-	public function update($object)
+	public function update($object, $update = NULL)
 	{
 		if ( ! $object->id)
 		{
@@ -100,18 +112,26 @@ class Arden_Repository_KohanaDatabase
 			$set[$p->getName()] = $object->{$p->getName()};
 		}
 
-		$updated = $this->_qb_update->table($this->_table_name)->where('id', '=', $object->id)->set($set)->execute($this->_database);
+		if ($update === NULL)
+		{
+			$update = clone $this->_qb_update;
+		}
+		$updated = $update->table($this->_table_name)->where('id', '=', $object->id)->set($set)->execute($this->_database);
 
 		return $object;
 	}
 
-	public function delete($object)
+	public function delete($object, $delete = NULL)
 	{
 		if ( ! $object->id)
 		{
 			throw new Arden_InvalidObjectException('Cannot delete a non-loaded object');
 		}
 
-		return (bool) $this->_qb_delete->table($this->_table_name)->where('id', '=', $object->id)->execute($this->_database);
+		if ($delete === NULL)
+		{
+			$delete = clone $this->_qb_delete;
+		}
+		return (bool) $delete->table($this->_table_name)->where('id', '=', $object->id)->execute($this->_database);
 	}
 }
