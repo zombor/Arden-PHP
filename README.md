@@ -1,5 +1,7 @@
 # Arden-PHP
 
+[![Build Status](https://secure.travis-ci.org/zombor/Arden-PHP.png)](http://travis-ci.org/zombor/Arden-PHP)
+
 Arden is a repository pattern library for php. It is a counterpart for [Arden](https://github.com/zombor/arden), which is a repository pattern gem for ruby.
 
 You can use Arden to abstract and isolate your persistance logic in your application. It is recommended to use Arden with POPOs (Plain Old PHP Objects) as your data entities, but you could also use your own or some other base class.
